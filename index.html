@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play Zone - Mini Games</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    color: white;
+    text-align: center;
+    min-height: 100vh;
+    padding: 30px 15px;
+}
+
+h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #00e5ff;
+}
+
+.subtitle {
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+.container {
+    max-width: 650px;
+    margin: auto;
+}
+
+.games {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+button {
+    background: #00c9ff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #ffcc00;
+    transform: scale(1.05);
+}
+
+.game-box {
+    background: rgba(255,255,255,0.1);
+    padding: 30px 20px;
+    border-radius: 20px;
+    min-height: 260px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.game-box h2 {
+    margin-bottom: 20px;
+    color: #00e5ff;
+}
+
+input {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    width: 160px;
+    font-size: 16px;
+    margin: 15px;
+}
+
+#message {
+    margin: 20px;
+    font-size: 18px;
+    color: #ffcc00;
+}
+
+.choices {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(3, 75px);
+    justify-content: center;
+    gap: 8px;
+    margin: 20px auto;
+}
+
+.cell {
+    width: 75px;
+    height: 75px;
+    font-size: 30px;
+    background: white;
+    color: #222;
+    border-radius: 10px;
+}
+
+footer {
+    margin-top: 35px;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎮 PLAY ZONE</h1>
+    <p class="subtitle">Welcome to the Mini Games World!</p>
+
+    <div class="games">
+        <button onclick="showGame('guess')">Number Guess</button>
+        <button onclick="showGame('rps')">Rock Paper Scissors</button>
+        <button onclick="showGame('tic')">Tic Tac Toe</button>
+    </div>
+
+    <div class="game-box" id="game">
+        <h2>Choose Your Game!</h2>
+        <p>Select any game above and start playing.</p>
+    </div>
+
+    <footer>
+        Made with ❤️ using HTML, CSS & JavaScript
+    </footer>
+
+</div>
+
+<script>
+
+let secretNumber = Math.floor(Math.random() * 10) + 1;
+let board = ["","","","","","","","",""];
+let currentPlayer = "X";
+let gameOver = false;
+
+// SWITCH GAMES
+function showGame(game) {
+
+    let box = document.getElementById("game");
+
+    if (game === "guess") {
+        box.innerHTML = `
+            <h2>🔢 Number Guessing Game</h2>
+            <p>Guess a number between 1 and 10</p>
+            <input type="number" id="guessInput" min="1" max="10">
+            <button onclick="checkGuess()">Check</button>
+            <p id="message">Good Luck!</p>
+            <button onclick="resetGuess()">New Game</button>
+        `;
+    }
+
+    else if (game === "rps") {
+        box.innerHTML = `
+            <h2>✊ Rock Paper Scissors</h2>
+            <p>Choose your move!</p><br>
+            <div class="choices">
+                <button onclick="playRPS('Rock')">✊ Rock</button>
+                <button onclick="playRPS('Paper')">✋ Paper</button>
+                <button onclick="playRPS('Scissors')">✌️ Scissors</button>
+            </div>
+            <p id="message">Let's Play!</p>
+        `;
+    }
+
+    else if (game === "tic") {
+        board = ["","","","","","","","",""];
+        currentPlayer = "X";
+        gameOver = false;
+
+        box.innerHTML = `
+            <h2>⭕ Tic Tac Toe</h2>
+            <p id="message">Player X's Turn</p>
+            <div id="board">
+                ${board.map((_,i) =>
+                    `<button class="cell" onclick="playTic(${i})"></button>`
+                ).join("")}
+            </div>
+            <button onclick="showGame('tic')">Restart</button>
+        `;
+    }
+}
+
+// NUMBER GUESSING GAME
+function checkGuess() {
+
+    let guess = Number(document.getElementById("guessInput").value);
+    let message = document.getElementById("message");
+
+    if (!Number.isInteger(guess) || guess < 1 || guess > 10) {
+        message.innerText = "Enter a number between 1 and 10!";
+    }
+
+    else if (guess === secretNumber) {
+        message.innerText = "🎉 Correct! You Won!";
+    }
+
+    else if (guess < secretNumber) {
+        message.innerText = "Too Low! Try Higher ⬆️";
+    }
+
+    else {
+        message.innerText = "Too High! Try Lower ⬇️";
+    }
+}
+
+function resetGuess() {
+    secretNumber = Math.floor(Math.random() * 10) + 1;
+    showGame('guess');
+}
+
+// ROCK PAPER SCISSORS
+function playRPS(player) {
+
+    let options = ["Rock","Paper","Scissors"];
+    let computer = options[Math.floor(Math.random() * 3)];
+
+    let result = "";
+
+    if (player === computer) {
+        result = "It's a Draw! 🤝";
+    }
+
+    else if (
+        (player === "Rock" && computer === "Scissors") ||
+        (player === "Paper" && computer === "Rock") ||
+        (player === "Scissors" && computer === "Paper")
+    ) {
+        result = "🎉 You Win!";
+    }
+
+    else {
+        result = "😢 Computer Wins!";
+    }
+
+    document.getElementById("message").innerText =
+        "You: " + player + " | Computer: " + computer + " | " + result;
+}
+
+// TIC TAC TOE
+function playTic(index) {
+
+    if (board[index] !== "" || gameOver) return;
+
+    board[index] = currentPlayer;
+
+    let cells = document.querySelectorAll(".cell");
+    cells[index].innerText = currentPlayer;
+
+    let winPatterns = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+    ];
+
+    let won = winPatterns.some(pattern =>
+        pattern.every(i => board[i] === currentPlayer)
+    );
+
+    if (won) {
+        document.getElementById("message").innerText =
+            "🎉 Player " + currentPlayer + " Wins!";
+        gameOver = true;
+        return;
+    }
+
+    if (board.every(cell => cell !== "")) {
+        document.getElementById("message").innerText = "It's a Draw!";
+        gameOver = true;
+        return;
+    }
+
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
+
+    document.getElementById("message").innerText =
+        "Player " + currentPlayer + "'s Turn";
+}
+
+</script>
+
+</body>
+</html>
